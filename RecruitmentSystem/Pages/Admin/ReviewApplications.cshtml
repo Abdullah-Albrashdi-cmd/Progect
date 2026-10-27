@@ -1,0 +1,116 @@
+@page
+@model ReviewApplicationsModel
+@{
+    ViewData["Title"] = "Review Applications";
+}
+
+<h1 class="h3 mb-3"><i class="bi bi-people me-2"></i>Review Applications</h1>
+
+<form method="get" class="card search-card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label asp-for="JobId" class="form-label small fw-semibold">Job</label>
+                <select asp-for="JobId" asp-items="Model.JobOptions" class="form-select">
+                    <option value="">All jobs</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="StatusFilter" class="form-label small fw-semibold">Status</label>
+                <select asp-for="StatusFilter" asp-items="Html.GetEnumSelectList<ApplicationStatus>()" class="form-select">
+                    <option value="">All statuses</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Apply filter</button>
+                <a asp-page="/Admin/ReviewApplications" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="alert alert-light border text-center py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>No applications match the selected filters.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center gap-2">
+            <span class="fw-semibold">@Model.Items.Count application(s)</span>
+            <input id="tableFilter" type="search" class="form-control form-control-sm w-auto" placeholder="Search applicants..." />
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle app-table mb-0 js-filterable js-sortable">
+                <thead>
+                    <tr>
+                        <th data-sort>#</th>
+                        <th data-sort>Applicant</th>
+                        <th data-sort>Job</th>
+                        <th data-sort>Applied</th>
+                        <th data-sort>Status</th>
+                        <th>Update status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        var app = item.Application;
+                        <tr>
+                            <td>@app.Id</td>
+                            <td>
+                                <div class="fw-semibold">@item.Applicant.FullName</div>
+                                <div class="small"><a href="mailto:@item.Applicant.Email">@item.Applicant.Email</a> &middot; @item.Applicant.Phone</div>
+                                <div class="small text-muted">@app.YearsExperience yr(s) experience
+                                    @if (!string.IsNullOrEmpty(app.ResumeUrl))
+                                    {
+                                        <span>&middot; <a href="@app.ResumeUrl" target="_blank" rel="noopener noreferrer">Resume</a></span>
+                                    }
+                                </div>
+                                <details class="small mt-1">
+                                    <summary class="text-primary">Cover letter</summary>
+                                    <p class="pre-line mb-0 mt-1">@app.CoverLetter</p>
+                                </details>
+                            </td>
+                            <td>
+                                <div>@item.Job.Title</div>
+                                <div class="small text-muted">@item.Job.Company</div>
+                            </td>
+                            <td data-value="@app.AppliedDate.Ticks" class="text-nowrap">@app.AppliedDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="badge @app.Status.ToBadgeClass()">@app.Status.GetDisplayName()</span></td>
+                            <td style="min-width: 16rem;">
+                                @if (app.IsFinal())
+                                {
+                                    <span class="small text-muted"><i class="bi bi-lock me-1"></i>Final decision</span>
+                                    @if (!string.IsNullOrEmpty(app.ReviewerNote))
+                                    {
+                                        <div class="small">@app.ReviewerNote</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <form method="post" asp-page-handler="Update" asp-route-id="@app.Id"
+                                          asp-route-StatusFilter="@Model.StatusFilter" asp-route-JobId="@Model.JobId">
+                                        <div class="input-group input-group-sm mb-1">
+                                            <select name="status" class="form-select">
+                                                @foreach (var s in Enum.GetValues<ApplicationStatus>())
+                                                {
+                                                    <option value="@s" selected="@(s == app.Status)">@s.GetDisplayName()</option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                        </div>
+                                        <input name="note" value="@app.ReviewerNote" maxlength="300"
+                                               class="form-control form-control-sm" placeholder="Note to candidate (optional)" />
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

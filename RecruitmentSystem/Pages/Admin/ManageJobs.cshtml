@@ -1,0 +1,159 @@
+@page
+@model ManageJobsModel
+@{
+    ViewData["Title"] = "Manage Jobs";
+}
+
+<h1 class="h3 mb-3"><i class="bi bi-kanban me-2"></i>Manage Jobs</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@Model.Jobs.Count</div><div class="stat-label">Total jobs</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@Model.ActiveCount</div><div class="stat-label">Open now</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@Model.TotalApplications</div><div class="stat-label">Applications</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">@Model.PendingCount</div><div class="stat-label">Pending review</div></div></div>
+</div>
+
+<div class="row g-4">
+    <!-- ============ Create / edit form ============ -->
+    <div class="col-xl-4">
+        <div class="card shadow-sm form-card">
+            <div class="card-header fw-semibold">
+                @if (Model.IsEditing)
+                {
+                    //<i class="bi bi-pencil-square me-1"></i><span>Edit job #@Model.Job.Id</span>
+                }
+                else
+                {
+                    <i class="bi bi-plus-circle me-1"></i><span>Post a new job</span>
+                }
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="Save">
+                    <input type="hidden" asp-for="Job.Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Job.Title" class="form-label"></label>
+                        <input asp-for="Job.Title" class="form-control" />
+                        <span asp-validation-for="Job.Title" class="text-danger"></span>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label asp-for="Job.Company" class="form-label"></label>
+                            <input asp-for="Job.Company" class="form-control" />
+                            <span asp-validation-for="Job.Company" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Job.Location" class="form-label"></label>
+                            <input asp-for="Job.Location" class="form-control" />
+                            <span asp-validation-for="Job.Location" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Job.Type" class="form-label"></label>
+                        <select asp-for="Job.Type" asp-items="Html.GetEnumSelectList<JobType>()" class="form-select"></select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label asp-for="Job.SalaryMin" class="form-label"></label>
+                            <input asp-for="Job.SalaryMin" class="form-control" />
+                            <span asp-validation-for="Job.SalaryMin" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Job.SalaryMax" class="form-label"></label>
+                            <input asp-for="Job.SalaryMax" class="form-control" />
+                            <span asp-validation-for="Job.SalaryMax" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Job.Deadline" class="form-label"></label>
+                        <input asp-for="Job.Deadline" class="form-control" />
+                        <span asp-validation-for="Job.Deadline" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Job.Description" class="form-label"></label>
+                        <textarea asp-for="Job.Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Job.Description" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Job.Requirements" class="form-label"></label>
+                        <textarea asp-for="Job.Requirements" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Job.Requirements" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            @(Model.IsEditing ? "Update job" : "Create job")
+                        </button>
+                        @if (Model.IsEditing)
+                        {
+                            <a asp-page="/Admin/ManageJobs" class="btn btn-outline-secondary">Cancel</a>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Jobs table ============ -->
+    <div class="col-xl-8">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center gap-2">
+                <span class="fw-semibold">All job postings</span>
+                <input id="tableFilter" type="search" class="form-control form-control-sm w-auto" placeholder="Filter table..." />
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle app-table mb-0 js-filterable js-sortable">
+                    <thead>
+                        <tr>
+                            <th data-sort>Job</th>
+                            <th data-sort>Type</th>
+                            <th data-sort>Salary</th>
+                            <th data-sort>Deadline</th>
+                            <th data-sort>State</th>
+                            <th data-sort class="text-center">Apps</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var job in Model.Jobs)
+                        {
+                            var state = job.GetState();
+                            var stateClass = state == "Open" ? "text-bg-success" : state == "Expired" ? "text-bg-warning" : "text-bg-secondary";
+                            var count = Model.ApplicationCounts.GetValueOrDefault(job.Id);
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@job.Title</div>
+                                    <div class="small text-muted">@job.Company &middot; @job.Location</div>
+                                </td>
+                                <td>@job.Type.GetDisplayName()</td>
+                                <td data-value="@job.SalaryMin" class="text-nowrap small">@job.GetSalaryRange()</td>
+                                <td data-value="@job.Deadline.Ticks" class="text-nowrap">@job.Deadline.ToString("dd MMM yyyy")</td>
+                                <td><span class="badge @stateClass">@state</span></td>
+                                <td class="text-center">
+                                    <a asp-page="/Admin/ReviewApplications" asp-route-JobId="@job.Id" class="badge text-bg-primary text-decoration-none">@count</a>
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <a asp-page="/Admin/ManageJobs" asp-route-editId="@job.Id" class="btn btn-outline-primary btn-sm" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <form method="post" asp-page-handler="Toggle" asp-route-id="@job.Id" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" title="@(job.IsOpen ? "Close job" : "Reopen job")">
+                                            <i class="bi @(job.IsOpen ? "bi-lock" : "bi-unlock")"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@job.Id" class="d-inline"
+                                          data-confirm="Delete this job and all of its applications?">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

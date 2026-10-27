@@ -1,0 +1,125 @@
+@page "{id:int}"
+@model JobDetailsModel
+@{
+    ViewData["Title"] = Model.Job.Title;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Jobs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Job.Title</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge rounded-pill badge-type">@Model.Job.Type.GetDisplayName()</span>
+                    @if (Model.Job.IsActive())
+                    {
+                        <span class="badge text-bg-success">Open</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">@Model.Job.GetState()</span>
+                    }
+                </div>
+                <h1 class="h3">@Model.Job.Title</h1>
+                <p class="text-muted"><i class="bi bi-building me-1"></i>@Model.Job.Company &nbsp;&middot;&nbsp; <i class="bi bi-geo-alt me-1"></i>@Model.Job.Location</p>
+
+                <div class="row text-center g-2 my-3">
+                    <div class="col-6"><div class="info-tile"><div class="small text-muted">Salary</div><div class="fw-semibold">@Model.Job.GetSalaryRange()</div></div></div>
+                    <div class="col-6"><div class="info-tile"><div class="small text-muted">Apply before</div><div class="fw-semibold">@Model.Job.Deadline.ToString("dd MMM yyyy")</div></div></div>
+                </div>
+
+                <h2 class="h6 text-uppercase text-muted mt-4">About the role</h2>
+                <p class="pre-line">@Model.Job.Description</p>
+
+                <h2 class="h6 text-uppercase text-muted mt-4">Requirements</h2>
+                <p class="pre-line mb-0">@Model.Job.Requirements</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm form-card">
+            <div class="card-body p-4">
+                <h2 class="h5 mb-3"><i class="bi bi-send me-2"></i>Apply for this job</h2>
+
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <div class="alert alert-info mb-0">
+                        Please <a asp-page="/Login" asp-route-ReturnUrl="@Url.Page("/JobDetails", new { id = Model.Job.Id })">log in</a>
+                        or <a asp-page="/Register">create an account</a> to apply.
+                    </div>
+                }
+                else if (!User.IsInRole("Candidate"))
+                {
+                    <div class="alert alert-secondary mb-0">HR administrator accounts cannot submit applications.</div>
+                }
+                else if (Model.AlreadyApplied)
+                {
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle me-1"></i>You have already applied for this position.
+                        <a asp-page="/MyApplications">Track your application</a>.
+                    </div>
+                }
+                else if (!Model.Job.IsActive())
+                {
+                    <div class="alert alert-warning mb-0">This position is no longer accepting applications.</div>
+                }
+                else
+                {
+                    <form method="post" asp-route-id="@Model.Job.Id">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.CoverLetter" class="form-label"></label>
+                            <textarea asp-for="Input.CoverLetter" class="form-control" rows="5" placeholder="Tell us why you are a great fit..."></textarea>
+                            <span asp-validation-for="Input.CoverLetter" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.ResumeUrl" class="form-label"></label>
+                            <input asp-for="Input.ResumeUrl" class="form-control" placeholder="https://linkedin.com/in/..." />
+                            <span asp-validation-for="Input.ResumeUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-5">
+                                <label asp-for="Input.YearsExperience" class="form-label"></label>
+                                <input asp-for="Input.YearsExperience" class="form-control" min="0" max="40" />
+                                <span asp-validation-for="Input.YearsExperience" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-7">
+                                <label asp-for="Input.Source" class="form-label"></label>
+                                <select asp-for="Input.Source" class="form-select">
+                                    <option value="">Select...</option>
+                                    <option>Company website</option>
+                                    <option>Online job board</option>
+                                    <option>University career fair</option>
+                                    <option>Friend or colleague</option>
+                                    <option>Social media</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="Input.Confirm" class="form-check-input" />
+                            <label asp-for="Input.Confirm" class="form-check-label"></label>
+                            <span asp-validation-for="Input.Confirm" class="text-danger d-block"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-send me-1"></i>Submit application</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

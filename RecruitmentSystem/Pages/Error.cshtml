@@ -1,0 +1,25 @@
+@page
+@model ErrorModel
+@{
+    ViewData["Title"] = Model.Heading;
+}
+
+<div class="text-center py-5">
+    <i class="bi bi-exclamation-octagon display-1 text-danger"></i>
+    @if (Model.Code.HasValue)
+    {
+        <div class="display-6 fw-bold text-muted mt-2">@Model.Code</div>
+    }
+    <h1 class="h3 mt-2">@Model.Heading</h1>
+    <p class="text-muted mx-auto" style="max-width: 32rem;">@Model.Message</p>
+
+    @if (!string.IsNullOrEmpty(Model.Details))
+    {
+        <div class="alert alert-warning text-start mx-auto" style="max-width: 40rem;">
+            <strong>Developer details:</strong> @Model.Details
+        </div>
+    }
+
+    <a asp-page="/Index" class="btn btn-primary"><i class="bi bi-house me-1"></i>Back to home</a>
+    <p class="small text-muted mt-3">Reference: @Model.RequestId</p>
+</div>

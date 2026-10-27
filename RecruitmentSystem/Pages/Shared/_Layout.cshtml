@@ -1,0 +1,107 @@
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    string Active(string page) => currentPage.Equals(page, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - TalentBridge</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @* Section 1: optional extra styles *@
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-page="/Index"><i class="bi bi-briefcase-fill me-2"></i>TalentBridge</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @Active("/Index")" asp-page="/Index"><i class="bi bi-search me-1"></i>Browse Jobs</a>
+                        </li>
+                        @if (User.IsInRole("Candidate"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @Active("/MyApplications")" asp-page="/MyApplications"><i class="bi bi-card-checklist me-1"></i>My Applications</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @Active("/Admin/ManageJobs")" asp-page="/Admin/ManageJobs"><i class="bi bi-kanban me-1"></i>Manage Jobs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @Active("/Admin/ReviewApplications")" asp-page="/Admin/ReviewApplications"><i class="bi bi-people me-1"></i>Review Applications</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav align-items-lg-center">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><span class="dropdown-item-text small text-muted">Signed in as @(User.IsInRole("Admin") ? "HR Administrator" : "Candidate")</span></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form method="post" asp-page="/Logout" class="px-3">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link @Active("/Login")" asp-page="/Login">Login</a></li>
+                            <li class="nav-item ms-lg-2"><a class="btn btn-light btn-sm px-3" asp-page="/Register">Register</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    @* Section 2: optional hero banner shown between the navbar and the page content *@
+    @await RenderSectionAsync("Hero", required: false)
+
+    <main class="container py-4 flex-grow-1" role="main">
+        <partial name="_Alerts" />
+        @RenderBody()
+    </main>
+
+    <footer class="app-footer mt-auto">
+        <div class="container py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+            <span>&copy; @DateTime.Now.Year TalentBridge - Online Recruitment &amp; Management System</span>
+            <span class="small">COMP4701 Web Application Development &middot; Sultan Qaboos University</span>
+        </div>
+        @* Section 3: optional extra footer content *@
+        @await RenderSectionAsync("Footer", required: false)
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @* Section 4: page specific scripts (e.g. client-side validation) *@
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

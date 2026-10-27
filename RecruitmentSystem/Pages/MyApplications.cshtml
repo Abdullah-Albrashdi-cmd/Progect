@@ -1,0 +1,58 @@
+@page
+@model MyApplicationsModel
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-card-checklist me-2"></i>My Applications</h1>
+    <a asp-page="/Index" class="btn btn-outline-primary btn-sm">Browse more jobs</a>
+</div>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="alert alert-light border text-center py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        You have not applied for any jobs yet. <a asp-page="/Index">Find a job</a> to get started.
+    </div>
+}
+else
+{
+    <div class="table-responsive card shadow-sm">
+        <table class="table table-hover align-middle app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Applied on</th>
+                    <th>Status</th>
+                    <th>Feedback from HR</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var app = item.Application;
+                    <tr>
+                        <td>
+                            <a asp-page="/JobDetails" asp-route-id="@item.Job.Id" class="fw-semibold text-decoration-none">@item.Job.Title</a>
+                            <div class="small text-muted">@item.Job.Company &middot; @item.Job.Location</div>
+                        </td>
+                        <td>@app.AppliedDate.ToString("dd MMM yyyy")</td>
+                        <td><span class="badge @app.Status.ToBadgeClass()">@app.Status.GetDisplayName()</span></td>
+                        <td class="small">@(app.ReviewerNote ?? "-")</td>
+                        <td class="text-end">
+                            @if (app.CanWithdraw())
+                            {
+                                <form method="post" asp-page-handler="Withdraw" asp-route-id="@app.Id"
+                                      data-confirm="Withdraw this application?" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Withdraw</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

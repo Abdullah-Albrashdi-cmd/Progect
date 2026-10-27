@@ -1,0 +1,95 @@
+/* =========================================================
+   TalentBridge theme - customises Bootstrap 5 (Requirement 13)
+   ========================================================= */
+:root {
+    --tb-primary: #0f766e;        /* teal */
+    --tb-primary-dark: #0b5a54;
+    --tb-navy: #0f2a43;
+    --tb-accent: #f59e0b;
+    --tb-bg: #f4f7f9;
+    --tb-border: #d9e2e8;
+
+    --bs-primary: var(--tb-primary);
+    --bs-primary-rgb: 15, 118, 110;
+    --bs-link-color: var(--tb-primary);
+    --bs-link-hover-color: var(--tb-primary-dark);
+    --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --bs-body-color: #1f2d3a;
+    --bs-border-radius: .6rem;
+}
+
+body { background-color: var(--tb-bg); }
+
+/* ---- Navigation ---- */
+.app-navbar { background: var(--tb-navy); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.app-navbar .nav-link { color: rgba(255,255,255,.8); border-bottom: 2px solid transparent; }
+.app-navbar .nav-link:hover { color: #fff; }
+.app-navbar .nav-link.active { color: #fff; border-bottom-color: var(--tb-accent); }
+
+/* ---- Hero ---- */
+.hero { background: linear-gradient(120deg, var(--tb-navy) 0%, var(--tb-primary) 100%); }
+
+/* ---- Buttons ---- */
+.btn-primary {
+    --bs-btn-bg: var(--tb-primary);
+    --bs-btn-border-color: var(--tb-primary);
+    --bs-btn-hover-bg: var(--tb-primary-dark);
+    --bs-btn-hover-border-color: var(--tb-primary-dark);
+    --bs-btn-active-bg: var(--tb-primary-dark);
+    --bs-btn-active-border-color: var(--tb-primary-dark);
+    --bs-btn-disabled-bg: var(--tb-primary);
+    --bs-btn-disabled-border-color: var(--tb-primary);
+}
+.btn-outline-primary {
+    --bs-btn-color: var(--tb-primary);
+    --bs-btn-border-color: var(--tb-primary);
+    --bs-btn-hover-bg: var(--tb-primary);
+    --bs-btn-hover-border-color: var(--tb-primary);
+    --bs-btn-active-bg: var(--tb-primary-dark);
+    --bs-btn-active-border-color: var(--tb-primary-dark);
+}
+.text-primary { color: var(--tb-primary) !important; }
+.text-bg-primary { background-color: var(--tb-primary) !important; }
+
+/* ---- Cards ---- */
+.card { border: 1px solid var(--tb-border); border-radius: .75rem; }
+.card-header { background: #fff; border-bottom: 1px solid var(--tb-border); }
+.job-card { transition: transform .15s ease, box-shadow .15s ease; }
+.job-card:hover { transform: translateY(-3px); box-shadow: 0 .6rem 1.2rem rgba(15,42,67,.12) !important; }
+.badge-type { background: rgba(15,118,110,.12); color: var(--tb-primary-dark); font-weight: 600; }
+.search-card { border-left: 4px solid var(--tb-accent); }
+.form-card { border-top: 4px solid var(--tb-primary); }
+.info-tile { background: var(--tb-bg); border-radius: .6rem; padding: .75rem; }
+
+/* ---- Dashboard stat cards ---- */
+.stat-card { background: #fff; border: 1px solid var(--tb-border); border-left: 4px solid var(--tb-primary);
+             border-radius: .75rem; padding: .9rem 1.1rem; }
+.stat-value { font-size: 1.8rem; font-weight: 700; color: var(--tb-navy); line-height: 1.1; }
+.stat-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: #6b7c8a; }
+
+/* ---- Forms ---- */
+.form-label { font-weight: 500; }
+.form-control, .form-select { border-color: var(--tb-border); }
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+    border-color: var(--tb-primary);
+    box-shadow: 0 0 0 .2rem rgba(15,118,110,.2);
+}
+.form-check-input:checked { background-color: var(--tb-primary); border-color: var(--tb-primary); }
+.field-validation-error, .text-danger { font-size: .85rem; }
+.input-validation-error { border-color: #dc3545 !important; }
+
+/* ---- Tables ---- */
+.app-table thead th { background: var(--tb-navy); color: #fff; font-weight: 600; font-size: .85rem;
+                      white-space: nowrap; border: 0; }
+.app-table tbody tr:nth-child(even) { background: rgba(15,42,67,.025); }
+.js-sortable th[data-sort] { cursor: pointer; user-select: none; }
+.js-sortable th[data-sort]::after { content: ' \2195'; opacity: .45; font-size: .75rem; }
+.js-sortable th.sorted-asc::after  { content: ' \25B2'; opacity: 1; }
+.js-sortable th.sorted-desc::after { content: ' \25BC'; opacity: 1; }
+
+/* ---- Misc ---- */
+.pre-line { white-space: pre-line; }
+.breadcrumb { --bs-breadcrumb-divider-color: #8aa; }
+
+/* ---- Footer ---- */
+.app-footer { background: var(--tb-navy); color: rgba(255,255,255,.75); font-size: .9rem; }

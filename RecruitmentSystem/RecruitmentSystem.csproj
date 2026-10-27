@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- Visual Studio 2026 ships the .NET 10 SDK. If you only have .NET 8 installed, change this to net8.0 -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RecruitmentSystem</RootNamespace>
+  </PropertyGroup>
+
+</Project>

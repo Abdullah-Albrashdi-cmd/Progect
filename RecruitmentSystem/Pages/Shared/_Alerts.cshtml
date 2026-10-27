@@ -1,0 +1,12 @@
+@* Displays one-time messages stored in TempData by the page handlers. *@
+@foreach (var (key, css, icon) in new[] { ("Success", "success", "check-circle-fill"), ("Error", "danger", "exclamation-triangle-fill"), ("Info", "info", "info-circle-fill") })
+{
+    if (TempData[key] is string message)
+    {
+        <div class="alert alert-@css alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-@icon me-2"></i>
+            <div>@message</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+}

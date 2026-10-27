@@ -1,0 +1,42 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Browse Jobs";
+}
+
+@section Hero {
+    <section class="hero text-white">
+        <div class="container py-4 py-md-5">
+            <h1 class="display-6 fw-bold mb-2">Find the job that fits you</h1>
+            <p class="lead mb-0">Browse open positions from companies across Oman and apply in minutes.</p>
+        </div>
+    </section>
+}
+
+<form id="searchForm" method="get" data-search-url="@Url.Page("/Index")" class="card search-card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label asp-for="Keyword" class="form-label small fw-semibold">Keyword</label>
+                <input asp-for="Keyword" class="form-control" placeholder="Title, company, skill..." />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Location" class="form-label small fw-semibold">Location</label>
+                <input asp-for="Location" class="form-control" placeholder="e.g. Muscat" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Type" class="form-label small fw-semibold">Job type</label>
+                <select asp-for="Type" asp-items="Html.GetEnumSelectList<JobType>()" class="form-select">
+                    <option value="">All types</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div id="jobResults">
+    <partial name="_JobList" model="Model.Jobs" />
+</div>
